@@ -108,7 +108,7 @@ public class Shamir {
     secret = prime.add(secret).add(tmp) . mod(prime);
     //secret[groupNum]=secret1;
     }
-  System.out.println("The secret is: " + secret + "\n");
+ // System.out.println("The secret is: " + secret + "\n");
 
     if(hvalue.compareTo(BigInteger.valueOf(secret.hashCode()))==0)
      

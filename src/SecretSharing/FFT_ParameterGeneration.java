@@ -227,10 +227,11 @@ public class FFT_ParameterGeneration {
 
 		prime_number = find_prime(bitsize, order_divisor);
 		// qq=bitsiz;
+		System.out.println("prime= "+prime_number);
 		gen = find_generator(prime_number);
 		
-		om=find_generator_(prime_number);
-		System.out.println("om= "+om);
+		//om=find_generator_(prime_number);
+	//	System.out.println("om= "+om);
 		order = prime_number.subtract(BigInteger.ONE);
 		order2 = order.divide(BigInteger.valueOf(order_divisor));
 		// omega = (Math.pow(gen, order2.doubleValue())) % qq.doubleValue();
