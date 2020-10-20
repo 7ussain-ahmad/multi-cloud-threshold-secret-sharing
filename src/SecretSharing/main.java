@@ -127,7 +127,7 @@ public class main {
              broker = createBroker();
             int brokerId = broker.getId();
             //Fourth step: Create VMs and Cloudlets and send them to broker
-            setAlgoID(1);
+            setAlgoID(2);
             setParticnum(4);
             setThreshold(2);
             VmCount=getParticnum();
