@@ -78,7 +78,7 @@ public class DatacenterBroker extends SimEntity {
 	// private static BigInteger prime;
 	// private static int max;
 	static int maxNumSh = 1000, shar = 2, maxThre = 300;
-	private BigInteger[] shares;
+	
 	private BigInteger primeNumber;
 	private BigInteger[] coeff;
 
@@ -87,6 +87,8 @@ public class DatacenterBroker extends SimEntity {
 	private double exec_time1;
 
 	private BigInteger rec_secret;
+	private BigInteger[] shares;
+	private BigInteger[][] shares1;
 
 	/**
 	 * Created a new DatacenterBroker object.
@@ -132,9 +134,10 @@ public class DatacenterBroker extends SimEntity {
 		coeff = generateCoeff(main.getParticnum(), primeNumber);
 		// System.out.println(primeNumber);
 		shares = secretSplit(main.getAlgoID(), main.getSecret(), coeff);
-		System.out.println("main.getAlgoID(" + main.getAlgoID());
+		System.out.println("main.getAlgoID= " + main.getAlgoID());
 		main.setReceivedShare(shares);
 		for (int i = 0; i < main.getCloudletList().size(); i++) {
+			
 			main.getCloudletList().get(i).setCloudletLength(shares[i].bitLength());
 			main.getCloudletList().get(i).setShare(shares[i]);
 //                    System.out.println("count " + share[i].bitCount());
@@ -176,7 +179,10 @@ public class DatacenterBroker extends SimEntity {
 		
 			Log.print("pg.getPrime_number()="+pg.getPrime_number().bitLength());
 			break;
-			
+		case 4:
+			Rabin_IDA rabin=new Rabin_IDA();
+			share=rabin.secretSplit(main.getParticnum(), main.getThreshold(), secret, primeNumber);
+			break;
 		default:
 			break;
 		}
@@ -206,6 +212,17 @@ public class DatacenterBroker extends SimEntity {
 			Shamir shamir1 = new Shamir();
 			rec_secret = shamir1.secretReconstruct(main.getThreshold(), FFT_ParameterGeneration.getPrime_number(), shares);
 
+		break;
+		case 4:
+			int[] fid = new int [cloudletReceivedList.size()];
+			int i=0;
+			for (Cloudlet c :cloudletReceivedList) {
+			fid[i]=	c.getCloudletId();
+			i++;
+			}
+			Rabin_IDA rabin = new Rabin_IDA();
+			rec_secret = rabin.secretReconstruct(main.getParticnum(),main.getThreshold(),shares, fid);
+			break;
 		default:
 			break;
 		}

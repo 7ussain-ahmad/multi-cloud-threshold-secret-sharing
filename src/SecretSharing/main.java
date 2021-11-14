@@ -9,7 +9,7 @@ package SecretSharing;
  * Copyright (c) 2009, The University of Melbourne, Australia
  */
 import java.math.BigInteger;
-//import org.cloudbus.cloudsim.examples.*;
+import org.cloudbus.cloudsim.examples.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -127,9 +127,9 @@ public class main {
              broker = createBroker();
             int brokerId = broker.getId();
             //Fourth step: Create VMs and Cloudlets and send them to broker
-            setAlgoID(3);
-            setParticnum(16);
-            setThreshold(8);
+            setAlgoID(2);
+            setParticnum(4);
+            setThreshold(2);
             VmCount=getParticnum();
             vmlist = createVM(brokerId, VmCount); //creating 20 vms
             cloudletList = createCloudlet(brokerId, particnum, 0); // creating 40 cloudlets
@@ -140,7 +140,7 @@ public class main {
             SecretSharingAlgorithm s = new SecretSharingAlgorithm(algoID, particnum, threshold);
                         /////////////////////////////////////////////////////////////////////////
 
-            secret = cloudletList.get(0).generateKey(7);
+            secret = cloudletList.get(0).generateKey(29);
             primeNumber = cloudletList.get(0).getPrime();
            // coeff = broker.generateCoeff(s.getParticNum(), primeNumber);
            // share = broker.secretSplit(s.getNum(), secret, coeff);
