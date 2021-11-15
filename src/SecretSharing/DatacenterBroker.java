@@ -127,107 +127,101 @@ public class DatacenterBroker extends SimEntity {
 		}
 		return coeff;
 	}
+        //////////////////////////////////////////////////////////////////////////////////////
+        // This method is used to get prime number && generate coeffs && split the key to generate shares 
+        // && assign shares to Cloudlets
+        //////////////////////////////////////////////////////////////////////////////////////
+    protected void proseccSecretSplit() {
 
-	protected void proseccSecretSplit() {
+        primeNumber = main.getCloudletList().get(0).getPrime();
+        coeff = generateCoeff(main.getParticnum(), primeNumber);
+        // System.out.println(primeNumber);
+        shares = secretSplit(main.getAlgoID(), main.getSecret(), coeff);
+        main.setReceivedShare(shares);
+        for (int i = 0; i < main.getCloudletList().size(); i++) {
+            main.getCloudletList().get(i).setCloudletLength(shares[i].bitLength());
+            main.getCloudletList().get(i).setShare(shares[i]);
+        }
 
-		primeNumber = main.getCloudletList().get(0).getPrime();
-		coeff = generateCoeff(main.getParticnum(), primeNumber);
-		// System.out.println(primeNumber);
-		shares = secretSplit(main.getAlgoID(), main.getSecret(), coeff);
-		System.out.println("main.getAlgoID= " + main.getAlgoID());
-		main.setReceivedShare(shares);
-		for (int i = 0; i < main.getCloudletList().size(); i++) {
-			
-			main.getCloudletList().get(i).setCloudletLength(shares[i].bitLength());
-			main.getCloudletList().get(i).setShare(shares[i]);
-//                    System.out.println("count " + share[i].bitCount());
-//                    System.out.println("length " + share[i].bitLength());
-
-		}
-
-	}
-
+    }
+       //////////////////////////////////////////////////////////////////////////////////////
+       // This method is used to split the key to generate shares based on AlgoID
+       //////////////////////////////////////////////////////////////////////////////////////
 	@SuppressWarnings("static-access")
-	public BigInteger[] secretSplit(int algorithm, BigInteger secret, BigInteger[] coeff) {
-		BigInteger[] share = new BigInteger[maxThre];
-		switch (algorithm) {
-		case 1:
-			XOR xor = new XOR();
-			share = xor.secretSplit(main.getParticnum(), main.getThreshold(), secret, coeff);
+    public BigInteger[] secretSplit(int algorithm, BigInteger secret, BigInteger[] coeff) {
+        BigInteger[] share = new BigInteger[maxThre];
+        switch (algorithm) {
+            case 1:
+                XOR xor = new XOR();
+                share = xor.secretSplit(main.getParticnum(), main.getThreshold(), secret, coeff);
 
-			break;
-		case 2:
-			Shamir shamir = new Shamir();
-			share = shamir.secretSplit(main.getParticnum(), main.getThreshold(), secret, coeff);
+                break;
+            case 2:
+                Shamir shamir = new Shamir();
+                share = shamir.secretSplit(main.getParticnum(), main.getThreshold(), secret, coeff);
 
-			break;
-		case 3:
-			FFT_ParameterGeneration pg = new FFT_ParameterGeneration();
-			BigInteger omega = pg.generate_parameters(main.getSecret().bitLength(),
-					main.getParticnum());
-			FFT fft = new FFT();
-			
-			double st = java.lang.System.nanoTime();
-			Log.printLine("*****************/////////////*****************");
-			
-			share = fft.secretSplit(main.getParticnum(), main.getThreshold(),secret, coeff, pg.getPrime_number(), omega);
-			Shamir.setHvalue( BigInteger.valueOf(secret.hashCode()));
-			
-			double et = java.lang.System.nanoTime();
-			Log.printLine(((CloudSim.clock() + ((et - st) / 1000000))) + ": " + getName() + ": split the secret");
-			Log.printLine("****************//////////////******************");
-		
-			Log.print("pg.getPrime_number()="+pg.getPrime_number().bitLength());
-			break;
-		case 4:
-			Rabin_IDA rabin=new Rabin_IDA();
-			share=rabin.secretSplit(main.getParticnum(), main.getThreshold(), secret, primeNumber);
-			break;
-		default:
-			break;
-		}
-		return share;
-	}
+                break;
+            case 3:
+                FFT_ParameterGeneration pg = new FFT_ParameterGeneration();
+                BigInteger omega = pg.generate_parameters(main.getSecret().bitLength(),
+                        main.getParticnum());
+                FFT fft = new FFT();
+                share = fft.secretSplit(main.getParticnum(), main.getThreshold(), secret, coeff, pg.getPrime_number(), omega);
+                Shamir.setHvalue(BigInteger.valueOf(secret.hashCode()));
+                break;
+            case 4:
+                Rabin_IDA rabin = new Rabin_IDA();
+                share = rabin.secretSplit(main.getParticnum(), main.getThreshold(), secret, primeNumber);
+                break;
+            default:
+                break;
+        }
+        return share;
+    }
+       //////////////////////////////////////////////////////////////////////////////////////
+       // This method is used to reconstruct the key
+       //////////////////////////////////////////////////////////////////////////////////////
+    private void proseccSecretReconstruct() {
+        shares = main.getReceivedShare();
+        rec_secret = secret_reconstruct(main.getAlgoID(), shares);
 
-	private void proseccSecretReconstruct() {
-		shares = main.getReceivedShare();
-		rec_secret = secret_reconstruct(main.getAlgoID(), shares);
+    }
+       //////////////////////////////////////////////////////////////////////////////////////
+       // This method is used to reconstruct the key based on AlgoID
+       //////////////////////////////////////////////////////////////////////////////////////
+	   private BigInteger secret_reconstruct(int algoID, BigInteger[] shares) {
+        BigInteger rec_secret = null;
+        switch (algoID) {
+            case 1:
+                XOR xor = new XOR();
+                rec_secret = xor.secretReconstruct(main.getParticnum(), shares);
 
-	}
+                break;
+            case 2:
+                Shamir shamir = new Shamir();
+                rec_secret = shamir.secretReconstruct(main.getThreshold(), main.getPrimeNumber(), shares);
 
-	private BigInteger secret_reconstruct(int algoID, BigInteger[] shares) {
-		BigInteger rec_secret = null;
-		switch (algoID) {
-		case 1:
-			XOR xor = new XOR();
-			rec_secret = xor.secretReconstruct(main.getParticnum(), shares);
+                break;
+            case 3:
+                Shamir shamir1 = new Shamir();
+                rec_secret = shamir1.secretReconstruct(main.getThreshold(), FFT_ParameterGeneration.getPrime_number(), shares);
 
-			break;
-		case 2:
-			Shamir shamir = new Shamir();
-			rec_secret = shamir.secretReconstruct(main.getThreshold(), main.getPrimeNumber(), shares);
-
-			break;
-		case 3:
-			Shamir shamir1 = new Shamir();
-			rec_secret = shamir1.secretReconstruct(main.getThreshold(), FFT_ParameterGeneration.getPrime_number(), shares);
-
-		break;
-		case 4:
-			int[] fid = new int [cloudletReceivedList.size()];
-			int i=0;
-			for (Cloudlet c :cloudletReceivedList) {
-			fid[i]=	c.getCloudletId();
-			i++;
-			}
-			Rabin_IDA rabin = new Rabin_IDA();
-			rec_secret = rabin.secretReconstruct(main.getParticnum(),main.getThreshold(),shares, fid);
-			break;
-		default:
-			break;
-		}
-		return rec_secret;
-	}
+                break;
+            case 4:
+                int[] fid = new int[cloudletReceivedList.size()];
+                int i = 0;
+                for (Cloudlet c : cloudletReceivedList) {
+                    fid[i] = c.getCloudletId();
+                    i++;
+                }
+                Rabin_IDA rabin = new Rabin_IDA();
+                rec_secret = rabin.secretReconstruct(main.getParticnum(), main.getThreshold(), shares, fid);
+                break;
+            default:
+                break;
+        }
+        return rec_secret;
+    }
 
 	/**
 	 * This method is used to send to the broker the list with virtual machines that
@@ -295,6 +289,9 @@ public class DatacenterBroker extends SimEntity {
 		case CloudSimTags.END_OF_SIMULATION:
 			shutdownEntity();
 			break;
+                ////////////////////////////////////////////////
+                // if all the requested VMs have been created //
+                ////////////////////////////////////////////////       
 		case CloudSimTags.SECRET_SPLIT:
 
 			double st = java.lang.System.nanoTime();
@@ -306,12 +303,14 @@ public class DatacenterBroker extends SimEntity {
 			Log.printLine("**********************************");
 			submitCloudlets();
 			break;
+                ////////////////////////////////////////////////
+                // if all the Cloudlets have been returned //
+                //////////////////////////////////////////////// 
 		case CloudSimTags.SECRET_RECONSTRUCTION:
 			double st1 = java.lang.System.nanoTime();
 			proseccSecretReconstruct();
 			double et1 = java.lang.System.nanoTime();
 			exec_time1 = (et1 - st1) / 1000000;
-			
 			Log.printLine("*******************************");
 			Log.printLine(exec_time1 + ": " + getName() + ": reconstruct the secret)");
 			Log.printLine("*******************************");
@@ -377,7 +376,9 @@ public class DatacenterBroker extends SimEntity {
 
 		incrementVmsAcks();
 
-		// all the requested VMs have been created
+                //////////////////////////////////////////
+                // all the requested VMs have been created //
+                ////////////////////////////////////////// 
 		if (getVmsCreatedList().size() == getVmList().size() - getVmsDestroyed()) {
 			if (main.isSplit_flag() == true)
 				schedule(getName(), CloudSim.clock(), CloudSimTags.SECRET_SPLIT);
@@ -419,6 +420,9 @@ public class DatacenterBroker extends SimEntity {
 		getCloudletReceivedList().add(cloudlet);
 		Log.printLine(CloudSim.clock() + ": " + getName() + ": Cloudlet " + cloudlet.getCloudletId() + " received");
 		cloudletsSubmitted--;
+                //////////////////////////////////////////
+                // if all  Cloudlets have been returned //
+                ////////////////////////////////////////// 
 		if (getCloudletReceivedList().size() == main.getThreshold() && main.isRec_flag() == true) {
 			schedule(getName(), 0, CloudSimTags.SECRET_RECONSTRUCTION);
 		}

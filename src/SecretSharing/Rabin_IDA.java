@@ -59,54 +59,52 @@ class Rabin_IDA {
 	 * depending on particNum and threshold the shares are calculated and the secret
 	 * is set to 0 after its hash value is calculated
 	 */
-	public static BigInteger[] secretSplit(int particNum, int threshold, BigInteger secret, BigInteger prime) {
+    public static BigInteger[] secretSplit(int particNum, int threshold, BigInteger secret, BigInteger prime) {
 
-		String str = prime.toString();
+        String str = prime.toString();
 
-		int arr[] = new int[str.length()];
-		// Integer aux[] = new Integer[str.length()];
-		for (int i = 0; i < str.length(); i++) {
-			arr[i] = Integer.parseInt(str.substring(i, i + 1));
-		}
-		st = java.lang.System.currentTimeMillis();
-		int n = particNum;
-		int m = threshold;
-		IDA ida = new IDA(n, m);
+        int arr[] = new int[str.length()];
+        // Integer aux[] = new Integer[str.length()];
+        for (int i = 0; i < str.length(); i++) {
+            arr[i] = Integer.parseInt(str.substring(i, i + 1));
+        }
+        st = java.lang.System.currentTimeMillis();
+        int n = particNum;
+        int m = threshold;
+        IDA ida = new IDA(n, m);
 
-		int a[][] = new int[n][m];
-		aa = new BigInteger[n][m];
+        int a[][] = new int[n][m];
+        aa = new BigInteger[n][m];
 
-		for (int i = 0; i < n; ++i) {
-			for (int j = 0; j < m; ++j) {
-				a[i][j] = ida.mulInGF256(i, j);
-				// aa[i][j]=BigDecimal.valueOf(a[i][j]).toBigInteger();
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                a[i][j] = ida.mulInGF256(i, j);
+                // aa[i][j]=BigDecimal.valueOf(a[i][j]).toBigInteger();
+            }
+        }
+        c = ida.encode(arr);
 
-			}
-		}
-		c = ida.encode(arr);
+        hvalue = BigInteger.valueOf(Arrays.hashCode(IDA.integerSeq));
 
-		hvalue = BigInteger.valueOf(Arrays.hashCode(IDA.integerSeq));
+        secret = BigInteger.ZERO;
 
-		secret = BigInteger.ZERO;
+        // temp[groupNum] = BigInteger.ZERO;
+        BigInteger[][] bigs = new BigInteger[c.length][c[0].length];
+        ArrayList<BigInteger> list = new ArrayList<BigInteger>();
+        BigInteger[] shares = new BigInteger[bigs[0].length * bigs.length];
 
-		// temp[groupNum] = BigInteger.ZERO;
-		BigInteger[][] bigs = new BigInteger[c.length][c[0].length];
-		ArrayList<BigInteger> list = new ArrayList<BigInteger>();
-		BigInteger[] shares = new BigInteger[bigs[0].length * bigs.length];
+        en = java.lang.System.currentTimeMillis();
 
-		en = java.lang.System.currentTimeMillis();
+        for (int i = 0; i < particNum; i++) {
+            for (int j = 0; j < c[i].length; j++) {
+                bigs[i][j] = BigInteger.valueOf(c[i][j]);
+                list.add(bigs[i][j]);
+            }
+        }
+        shares = list.toArray(new BigInteger[bigs[0].length * bigs.length]);
 
-		for (int i = 0; i < particNum; i++) {
-			for (int j = 0; j < c[i].length; j++) {
-				bigs[i][j] = BigInteger.valueOf(c[i][j]);
-				list.add(bigs[i][j]);
-			}
-		}
-
-		shares = list.toArray(new BigInteger[bigs[0].length * bigs.length]);
-
-		return  shares;
-	}
+        return shares;
+    }
 
 	/*
 	 * In this method the secret is constructed using the received threshold value
@@ -114,20 +112,19 @@ class Rabin_IDA {
 	 * and compared with the calculated hash value of the secret in the secret
 	 * spliting method
 	 */
-	public static BigInteger secretReconstruct(int particnum,int threshold,BigInteger[] shares, int[] fid) {
-		int k;
-		String rme = "";
-		int m = threshold;
-		int n=particnum;
-		
+    public static BigInteger secretReconstruct(int particnum, int threshold, BigInteger[] shares, int[] fid) {
+        int k;
+        String rme = "";
+        int m = threshold;
+        int n = particnum;
 
-		a = new double[m][m];
-		double ia[][] = new double[m][m];
-		int[] dm;
-		
-		/*
+        a = new double[m][m];
+        double ia[][] = new double[m][m];
+        int[] dm;
+
+        /*
 		 * for (int i = 0; i < m; ++i) { System.out.println("fid===" + fid[i]); }
-		 */
+         */
 //        Inverse in=new Inverse();
 //    	ia=in.invert(a);
 //       for(int i=0;i<c.length;++i){
@@ -136,29 +133,21 @@ class Rabin_IDA {
 //                        dm[i]+=ia[i%m][p]*c[p][i/m];
 //       	 	}
 //       }
-		/*
+        /*
 		 * int l=0; for (int i = 0; i < particnum; i++) { for (int j = 0; j < threshold;
 		 * j++) { c[i][j]=shares[l].intValue(); l++; } }
-		 */
-		IDA ida = new IDA(n, m);
-		dm = ida.decode(c, fid);
-//       for(int i=0;i<dm.length;++i){
-//    		rme+=Math.round(dm[i])+" ";
-//    	}
-		//System.out.println("dm=");
-//       for  (int i = 0; i < dm.length; i++) {
-//               System.out.print(dm[i]);
-////               System.out.println("rme="+rme);
-//           }
-		if (hvalue.compareTo(BigInteger.valueOf(Arrays.hashCode(dm))) == 0) {
-			System.out.println("success");
-		} else {
-			
-			System.out.println("failedddd");
-		}
+         */
+        IDA ida = new IDA(n, m);
+        dm = ida.decode(c, fid);
+        if (hvalue.compareTo(BigInteger.valueOf(Arrays.hashCode(dm))) == 0) {
+            System.out.println("success");
+        } else {
 
-		return BigInteger.valueOf(dm[0]);
-	}
+            System.out.println("failedddd");
+        }
+
+        return BigInteger.valueOf(dm[0]);
+    }
 
 	/*
 	 * Method to store the received shares from the clients that are required to

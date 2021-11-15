@@ -264,9 +264,12 @@ public class CloudSimTags {
 	public static final int Network_Event_Host = BASE + 47;
 
 	public static final int NextCycle = BASE + 48;
+        ///////////////////////////////////////////////////////////
+        // add two Tags for splitting and Reconstructing the key //
+        ///////////////////////////////////////////////////////////
+        public static final int SECRET_SPLIT=BASE+49;
         
-    public static final int SECRET_SPLIT=BASE+49;
-    public static final int SECRET_RECONSTRUCTION=BASE+50;
+        public static final int SECRET_RECONSTRUCTION=BASE+50;
 	/** Private Constructor */
 	private CloudSimTags() {
 		throw new UnsupportedOperationException("CloudSim Tags cannot be instantiated");

@@ -69,58 +69,28 @@ class FFT {
      method and depending on particNum and threshold the shares are
      calculated and the secret is set to 0 after its hash value is
      calculated*/
-    public static BigInteger[] secretSplit(int particNum, int threshold,BigInteger sec, BigInteger [] coeff, BigInteger primee, BigInteger omega) {
-
-      
-
-//     omega=BigInteger.valueOf(179);
-//     prime=BigInteger.valueOf(433);
-    //    System.out.println("omega= " + omega);
-    // System.out.println("qq= " + qq);
-
-        // System.out.println("bit length   ="+prime.bitLength());
+    public static BigInteger[] secretSplit(int particNum, int threshold, BigInteger sec, BigInteger[] coeff, BigInteger primee, BigInteger omega) {
         prime = primee;
-      //  System.out.println("Prime Number: " + prime);//
-        //System.out.println("prime "+prime);
-        //  System.out.println("bit length  "+prime.bitLength());
         secret = sec;
-
-     //System.out.println("generation tmie=  "+(ee-ss));
-     
-//System.out.println("secret Number: " + secret[groupNum]);
-      
-
         coeff[0] = secret;
         // System.out.println("coeff[0]  ="+coeff[0]);
-
         for (int i = 1; i < threshold; i++) {
             coeff[i] = rndBigInt(prime);
-           // System.out.println("coeff[" + i + "]  =" + coeff[i]);
+            // System.out.println("coeff[" + i + "]  =" + coeff[i]);
         }
-
         for (int i = threshold; i < particNum; i++) {
             coeff[i] = BigInteger.ZERO;
-          //  System.out.println("coeff[" + i + "]  =" + coeff[i]);
+            //  System.out.println("coeff[" + i + "]  =" + coeff[i]);
         }
         coefff = FFT2_Forward(coeff, omega);
-
         for (int x = 0; x < particNum; x++) {
-
             shares[x] = coefff[x];
-
-          //  shares[x] = BigInteger.valueOf(x);
-
-         //   System.out.println("Share " + shares[x]);
         }
-
         hvalue = BigInteger.valueOf(secret.hashCode());
-
         secret = BigInteger.ZERO;
-
         temp = BigInteger.ZERO;
         en = java.lang.System.currentTimeMillis();
-        // System.out.println("ssssssssp time  "+(en-st));
-		return coeff;
+        return coeff;
 
     }
 
@@ -170,12 +140,9 @@ class FFT {
      the secret in the secret spliting method*/
     public static int secretReconstruct(int threshold, int groupNum) {
         int k;
-
         for (int formula = 0; formula < threshold; formula++) {
             BigInteger numer = BigInteger.ONE;
-
             BigInteger denom = BigInteger.ONE;
-
             //System.out.println("Number of shares is: "+threshold);
             for (int count = 0; count < threshold; count++) {
                 if (formula == count) {
@@ -196,10 +163,7 @@ class FFT {
             BigInteger tmp = share[formula].multiply(numer).multiply(denom.modInverse(prime));
 
             secret = prime.add(secret).add(tmp).mod(prime);
-            //secret[groupNum]=secret1;
         }
-//System.out.println("The secret is: " + secret[groupNum] +"for group number "+groupNum+ "\n");
-
         if (hvalue.compareTo(BigInteger.valueOf(secret.hashCode())) == 0) {
             k = 1;
         } else {
