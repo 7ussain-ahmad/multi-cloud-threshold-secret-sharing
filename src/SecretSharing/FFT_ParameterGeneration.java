@@ -128,110 +128,86 @@ public class FFT_ParameterGeneration {
 //
 //                }
 //            }
-
 		}
-
 	}
 	
-	public static BigInteger find_generator_(BigInteger q) {
-		BigInteger i = BigInteger.valueOf(2);
-		BigInteger g = null;
-		while (i.compareTo(q) < 0) {
-			//if(!is_prime(i)) break;
-			 g=MultiplicativeOrder.moTest(i, q);
-			if(g.compareTo(BigInteger.valueOf(4))==0)
-				break;
-			i = i.add(BigInteger.ONE);
-		}
-		
-		return i;
-			
-	}
+    public static BigInteger find_generator(BigInteger q) {
 
-	public static BigInteger find_generator(BigInteger q) {
-		
-		BigInteger order, exponent, factor;
-		BigInteger d = null;
-		BigInteger d1 = null;
-		BigInteger i = BigInteger.valueOf(2);
-		BigInteger g = BigInteger.ZERO;
-		boolean gg = true;
-		int a = 0;
-		order = q.subtract(BigInteger.ONE);
+        BigInteger order, exponent, factor;
+        BigInteger d = null;
+        BigInteger d1 = null;
+        BigInteger i = BigInteger.valueOf(2);
+        BigInteger g = BigInteger.ZERO;
+        boolean gg = true;
+        int a = 0;
+        order = q.subtract(BigInteger.ONE);
 
-		outerloop: while (i.compareTo(q) < 0) {
-		//	System.out.println("i=  " + i);
-			gg = true;
-		//	System.out.println("i.modPow(order, q)  " +i.modPow(order, q) );
-			
-		//	if (!i.modPow(order, q).equals(BigInteger.ONE)) {
-		//		gg = false;
-		//		break;}
-			
-			for (int j = 0; j < primeFactors.size(); j++) {
-			/*	System.out.println("i.modPow(order, q)  " +i.modPow(order, q) );
+        outerloop:
+        while (i.compareTo(q) < 0) {
+            //	System.out.println("i=  " + i);
+            gg = true;
+            //	System.out.println("i.modPow(order, q)  " +i.modPow(order, q) );
+
+            //	if (!i.modPow(order, q).equals(BigInteger.ONE)) {
+            //		gg = false;
+            //		break;}
+            for (int j = 0; j < primeFactors.size(); j++) {
+                /*	System.out.println("i.modPow(order, q)  " +i.modPow(order, q) );
 				if (!i.modPow(order, q).equals(BigInteger.ONE)) {
 					gg = false;
 					break;*/
-				
-				if (is_prime(i)) {
-					factor = (BigInteger) primeFactors.get(j);
 
-				//	 System.out.println("factor= " + factor);
-					exponent = order.divide(factor);
-					// d = Math.pow(i, exponent.doubleValue()) % q.doubleValue();
-					d = power(i, exponent, q);
-					d1 = i.mod(q);
-					if (d.equals(BigInteger.valueOf(1))) // if (d==1)
-					{
-						gg = false;
-						break;
-					}
-					a = j;
-				} else {
-					break;
-				}
-				if (gg == false)
-					a = 0;
-			}
+                if (is_prime(i)) {
+                    factor = (BigInteger) primeFactors.get(j);
 
-			if (a == primeFactors.size() - 1) {
-				gg = true;
-				g = i;
-				break outerloop;
-			}
+                    //	 System.out.println("factor= " + factor);
+                    exponent = order.divide(factor);
+                    // d = Math.pow(i, exponent.doubleValue()) % q.doubleValue();
+                    d = power(i, exponent, q);
+                    d1 = i.mod(q);
+                    if (d.equals(BigInteger.valueOf(1))) // if (d==1)
+                    {
+                        gg = false;
+                        break;
+                    }
+                    a = j;
+                } else {
+                    break;
+                }
+                if (gg == false) {
+                    a = 0;
+                }
+            }
+            if (a == primeFactors.size() - 1) {
+                gg = true;
+                g = i;
+                break outerloop;
+            }
 //            if (gg == true) {
 //                g = i;
 //                System.out.println("i= "+i);
 //                return g;
 //
 //            }
-
-			i = i.add(BigInteger.ONE);
-		}
-		// System.out.println("d= " +d.intValue());
-		// System.out.println("d= " + d);
-		System.out.println("g=  " + g);
-		if (gg == true) {
-			return g;
-		} else {
-			return BigInteger.ZERO.subtract(BigInteger.ONE);
-		}
-	}
+            i = i.add(BigInteger.ONE);
+        }
+        // System.out.println("d= " +d.intValue());
+        // System.out.println("d= " + d);
+        System.out.println("g=  " + g);
+        if (gg == true) {
+            return g;
+        } else {
+            return BigInteger.ZERO.subtract(BigInteger.ONE);
+        }
+    }
 
 	public static BigInteger generate_parameters(long bitsizee, int order_divisor) {
 		BigInteger order, order2;
 		BigInteger omega;
 		BigInteger bitsize = BigInteger.valueOf(bitsizee);
-		BigInteger om;
-
 		prime_number = find_prime(bitsize, order_divisor);
-		// qq=bitsiz;
 		System.out.println("prime= "+prime_number);
 		gen = find_generator(prime_number);
-		
-		//om=find_generator_(prime_number);
-	//	System.out.println("om= "+om);
 		order = prime_number.subtract(BigInteger.ONE);
 		order2 = order.divide(BigInteger.valueOf(order_divisor));
 		// omega = (Math.pow(gen, order2.doubleValue())) % qq.doubleValue();

@@ -82,8 +82,8 @@ public class main {
         MyVm[] vm = new MyVm[vms];
         for (int i = 0; i < vms; i++) {
             vm[i] = new MyVm(i, userId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared(), null);
-			//for creating a VM with a space shared scheduling policy for cloudlets:
-            //vm[i] = Vm(i, userId, mips, pesNumber, ram, bw, size, priority, vmm, new CloudletSchedulerSpaceShared());
+	//for creating a VM with a space shared scheduling policy for cloudlets:
+        //vm[i] = Vm(i, userId, mips, pesNumber, ram, bw, size, priority, vmm, new CloudletSchedulerSpaceShared());
             list.add(vm[i]);
         }
         return list;
@@ -138,21 +138,20 @@ public class main {
             
             /////////////////////////////////////////////////////////////////////////
             SecretSharingAlgorithm s = new SecretSharingAlgorithm(algoID, particnum, threshold);
-                        /////////////////////////////////////////////////////////////////////////
-
+            /////////////////////////////////////////////////////////////////////////
             secret = cloudletList.get(0).generateKey(29);
             primeNumber = cloudletList.get(0).getPrime();
            // coeff = broker.generateCoeff(s.getParticNum(), primeNumber);
            // share = broker.secretSplit(s.getNum(), secret, coeff);
 //            for (int i = 0; i < VmCount; i++) {
 //                cloudletList.get(i).setCloudletLength(share[i].bitLength());
-                System.out.println(" the secret is => " + secret);
+               System.out.println(" the secret is => " + secret);
                System.out.println("the secret length is => " + secret.bitLength());
 //               broker.bindCloudletToVm(i, i);
 //            }
             for (int i = 0; i < VmCount; i++) {
-              //  vmlist.get(i).setShare(share[i]); /////////////
-                broker.bindCloudletToVm(i, i);
+             //  vmlist.get(i).setShare(share[i]); /////////////
+             broker.bindCloudletToVm(i, i);
             }
             // Fifth step: Starts the simulation
             CloudSim.startSimulation();
@@ -201,7 +200,7 @@ public class main {
             
             /////////////////////////////////////////////////////////////////////////
             SecretSharingAlgorithm s = new SecretSharingAlgorithm(algoID, particnum, threshold);
-                        /////////////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////////////
             setRec_flag(true);
             setSplit_flag(false);
             for (int i = 0; i < VmCount; i++) {
